@@ -1,0 +1,42 @@
+/* frontend/src/components/Navbar.css */
+
+/* Remove o estilo de link padrão e adiciona espaçamento */
+.navbar-nav .nav-link {
+    color: #000 !important;
+    padding: 8px 15px;
+    margin-right: 20px;
+    border-radius: 5px;
+    text-decoration: none !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Remove fundo fixo do active, deixa só o hover */
+.navbar-nav .nav-link.active {
+    background-color: transparent !important;
+    font-weight: normal !important;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Barra de Pesquisa "Gordinha" */
+.form-control-search {
+    width: 350px !important;
+    padding: 10px 15px;
+    font-size: 1.05rem;
+}
+
+/* Responsividade */
+@media (max-width: 991px) {
+    .form-control-search {
+        width: 100% !important;
+    }
+    .navbar-nav .nav-link {
+        margin-right: 0;
+    }
+    .icons-area {
+        margin-left: 0 !important;
+        margin-top: 1rem;
+    }
+}
