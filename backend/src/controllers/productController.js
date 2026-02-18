@@ -1,7 +1,7 @@
 const Product = require('../models/Product');
 
-// Listar todos
-exports.getAllProducts = async (req, res) => {
+// 1. Listar todos
+const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find();
         res.json(products);
@@ -10,8 +10,8 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
-// Buscar por ID
-exports.getProductById = async (req, res) => {
+// 2. Buscar por ID
+const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Produto não encontrado' });
@@ -21,8 +21,8 @@ exports.getProductById = async (req, res) => {
     }
 };
 
-// ESTA FUNÇÃO NOVA 👇
-exports.createProduct = async (req, res) => {
+// 3. Criar Produto (A FUNÇÃO QUE FALTAVA)
+const createProduct = async (req, res) => {
     const product = new Product({
         titulo: req.body.titulo,
         descricao: req.body.descricao,
@@ -38,13 +38,15 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-// ATUALIZAR O EXPORT NO FINAL 👇
-exports.seedDatabase = async (req, res) => { /* ...sua função seed... */ };
+// 4. Função Seed (Deixei vazia para não dar erro, já que vamos usar o script do navegador)
+const seedDatabase = async (req, res) => {
+    res.json({ message: "Use o script do frontend para popular o banco!" });
+};
 
-// Mude o module.exports para incluir o createProduct
+// EXPORTAÇÃO CORRETA E LIMPA ✅
 module.exports = {
     getAllProducts,
     getProductById,
-    createProduct, // <--- NÃO ESQUEÇA DE ADICIONAR AQUI
-    seedDatabase// (se tiver)
+    createProduct,
+    seedDatabase
 };
