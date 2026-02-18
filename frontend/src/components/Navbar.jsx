@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navbar, Nav, Container, Badge, Button } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { BiCart, BiStore, BiLogOut, BiUserCircle, BiGridAlt } from 'react-icons/bi';
@@ -8,8 +8,6 @@ import { BiCart, BiStore, BiLogOut, BiUserCircle, BiGridAlt } from 'react-icons/
 const Navigation = () => {
     const { cart } = useContext(CartContext);
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-    const navigate = useNavigate();
-
     // Verifica se o usuário tem o "crachá" (Token)
     const isLogged = !!localStorage.getItem('token');
 
