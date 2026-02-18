@@ -55,7 +55,7 @@ const Navigation = () => {
                             </Nav.Link>
                         )}
 
-                        <Nav.Link as={Link} to="/checkout" className="position-relative">
+                        <Nav.Link as={Link} to="/carrinho" className="position-relative">
                             <BiCart size={28} />
                             {totalItems > 0 && (
                                 <Badge 
