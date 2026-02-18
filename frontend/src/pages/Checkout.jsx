@@ -90,7 +90,7 @@ const Checkout = () => {
 
         try {
             // 2. Faz o POST para a nossa API
-            const response = await fetch('http://localhost:3000/api/pedidos', {
+            const response = await fetch('https://minha-api-livraria.onrender.com/api/pedidos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

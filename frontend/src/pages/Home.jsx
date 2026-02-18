@@ -9,7 +9,7 @@ const Home = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/produtos')
+        fetch('https://minha-api-livraria.onrender.com/api/produtos')
             .then(res => {
                 if (!res.ok) throw new Error('Erro ao buscar produtos');
                 return res.json();

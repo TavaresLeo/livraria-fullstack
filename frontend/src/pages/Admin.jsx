@@ -8,7 +8,7 @@ const Admin = () => {
 
     const carregarPedidos = () => {
         setLoading(true);
-        fetch('http://localhost:3000/api/pedidos')
+        fetch('https://minha-api-livraria.onrender.com/api/pedidos')
             .then(res => res.json())
             .then(data => {
                 setPedidos(data);
@@ -26,7 +26,7 @@ const Admin = () => {
         if (!window.confirm("Confirmar envio deste pedido?")) return;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/pedidos/${id}`, {
+            const response = await fetch(`https://minha-api-livraria.onrender.com/api/pedidos/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'Enviado 🚚' })

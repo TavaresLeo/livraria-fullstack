@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create ({
-    baseURL: 'http://localhost:3000/api', // URL do Backend
+    baseURL: 'https://minha-api-livraria.onrender.com/api', // URL do Backend
 
 });
 
