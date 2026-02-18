@@ -2,8 +2,7 @@ import React, { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-// Adicionei o BiCartAdd aqui em cima junto com os outros
-import { BiTrash, BiMinus, BiPlus, BiArrowBack, BiCheckCircle, BiCartAdd } from 'react-icons/bi';
+import { BiTrash, BiMinus, BiPlus, BiArrowBack, BiCheckCircle } from 'react-icons/bi';
 
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
@@ -11,7 +10,7 @@ const Cart = () => {
     // Calcula o valor total do pedido
     const totalPedido = cart.reduce((acc, item) => acc + (item.preco * item.quantity), 0);
 
-    // Função auxiliar para imagem
+    // Função auxiliar para imagem (igual usamos nas outras páginas)
     const getImagemUrl = (caminho) => {
         return caminho.startsWith('http') ? caminho : `/${caminho}`;
     };
@@ -21,7 +20,7 @@ const Cart = () => {
         return (
             <Container className="py-5 text-center mt-5">
                 <div className="mb-4 text-muted">
-                    <BiCartAdd size={64} style={{ opacity: 0.5 }} />
+                    <BiCartAdd size={64} style={{ opacity: 0.5 }} /> {/* Se der erro no ícone, troque por BiCart */}
                 </div>
                 <h3>Seu carrinho está vazio</h3>
                 <p className="text-muted mb-4">Que tal dar uma olhada nos nossos lançamentos?</p>
@@ -129,7 +128,6 @@ const Cart = () => {
                                 <span>R$ {totalPedido.toFixed(2).replace('.', ',')}</span>
                             </div>
 
-                            {/* ESTE BOTÃO LEVA AO CHECKOUT, MAS SÓ SE CLICAR NELE */}
                             <Link to="/checkout" className="btn btn-success btn-lg w-100 fw-bold d-flex align-items-center justify-content-center">
                                 <BiCheckCircle className="me-2"/> Finalizar Compra
                             </Link>
@@ -140,5 +138,8 @@ const Cart = () => {
         </Container>
     );
 };
+
+// Caso não tenha importado o BiCartAdd lá em cima, use apenas BiCart no import
+import { BiCartAdd } from 'react-icons/bi'; 
 
 export default Cart;
