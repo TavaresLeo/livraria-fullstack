@@ -38,7 +38,7 @@ const Admin = () => {
                     p._id === id ? { ...p, status: 'Enviado 🚚' } : p
                 ));
             }
-        } catch (error) {
+        } catch {
             alert("Erro ao atualizar status");
         }
     };
