@@ -80,7 +80,7 @@ const Checkout = () => {
                 cep: cep
             },
             itens: cart.map(item => ({
-                produtoId: item.id,
+                produtoId: item.id ?? item._id,
                 titulo: item.titulo,
                 quantidade: item.quantity,
                 precoUnitario: item.preco
