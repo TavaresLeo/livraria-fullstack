@@ -2,41 +2,52 @@ import React, { useContext } from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
 import { CartContext } from '../context/CartContext';
 import { BiCartAdd } from 'react-icons/bi';
+import { Link } from 'react-router-dom';
 
-const ProductCard = ({ product }) => {
+// ATENÇÃO AQUI: O componente DEVE receber "product" como propriedade
+const ProductCard = ({ product }) => { 
     const { addToCart } = useContext(CartContext);
 
+    // Garante que a imagem tenha o caminho certo
+    const getImagemUrl = (caminho) => {
+        return caminho.startsWith('http') ? caminho : `/${caminho}`;
+    };
+
     return (
-        <Card className="h-100 shadow-sm border-0 product-card">
-            <div className="position-relative" style={{ height: '250px', overflow: 'hidden' }}>
-                 <Card.Img 
+        <Card className="h-100 shadow-sm border-0 hover-card">
+            <div className="position-relative">
+                <Card.Img 
                     variant="top" 
-                    src={product.imagem} 
-                    alt={product.titulo}
-                    className="h-100 w-100"
-                    style={{ objectFit: 'contain', padding: '1rem' }}
+                    src={getImagemUrl(product.imagem)} 
+                    style={{ height: '250px', objectFit: 'cover' }}
                 />
                 <Badge bg="warning" text="dark" className="position-absolute top-0 end-0 m-2">
                     Novo
                 </Badge>
             </div>
+            
             <Card.Body className="d-flex flex-column">
-                <Card.Title className="fw-bold text-truncate">{product.titulo}</Card.Title>
-                <Card.Text className="small text-muted mb-4" style={{ height: '40px', overflow: 'hidden' }}>
-                    {product.descricao}
+                <Card.Title className="fw-bold">{product.titulo}</Card.Title>
+                <Card.Text className="text-muted small flex-grow-1">
+                    {product.descricao ? product.descricao.substring(0, 80) + '...' : 'Sem descrição'}
                 </Card.Text>
                 
-                <div className="mt-auto d-flex align-items-center justify-content-between">
-                    <span className="fs-5 fw-bold text-primary">
-                        R$ {parseFloat(product.preco).toFixed(2).replace('.', ',')}
-                    </span>
+                <h4 className="mb-3 text-success fw-bold">
+                    R$ {product.preco.toFixed(2).replace('.', ',')}
+                </h4>
+
+                <div className="d-flex gap-2">
+                    <Link to={`/produto/${product.id}`} className="btn btn-outline-secondary w-50">
+                        Detalhes
+                    </Link>
+                    
+                    {/* O ERRO PROVAVELMENTE ESTAVA AQUI 👇 */}
                     <Button 
-                        variant="outline-primary" 
-                        size="sm" 
-                        className="rounded-circle p-2"
-                        onClick={() => addToCart(product)}
+                        variant="warning" 
+                        className="w-50 fw-bold"
+                        onClick={() => addToCart(product)} 
                     >
-                        <BiCartAdd size={20}/>
+                        <BiCartAdd size={20}/> Comprar
                     </Button>
                 </div>
             </Card.Body>
@@ -44,4 +55,4 @@ const ProductCard = ({ product }) => {
     );
 };
 
-export default ProductCard; // <--- O SEGREDO ESTÁ AQUI (Export Default)
+export default ProductCard;

@@ -36,8 +36,9 @@ const Home = () => {
 
                 <Row>
                     {products.map(product => (
-                        <Col key={product.id} md={3} className="mb-4">
-                            <ProductCard product={product} />
+                        <Col key={produto.id || produto._id} md={4} className="mb-4">
+                            {/* O ERRO PODE ESTAR AQUI SE VOCÊ PASSOU product={itemFixo} */}
+                            <ProductCard product={produto} /> 
                         </Col>
                     ))}
                 </Row>
