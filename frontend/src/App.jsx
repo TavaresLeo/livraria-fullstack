@@ -8,6 +8,8 @@ import Cart from './pages/Cart'; // <--- Importe a página do carrinho
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';  
 import Admin from './pages/Admin';  // <--- Importe a página de administração
+import PrivateRoute from './components/PrivateRoute'; // <--- Importe o componente de rota privada  
+
 
 function App() {
   return (
@@ -22,7 +24,9 @@ function App() {
                 <Route path="/carrinho" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/admin" element={<Admin />} />
+                
+                {/* Rota protegida: só acessível se o usuário estiver logado */}
+                <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
 
                 <Route path="*" element={<h1 className="text-center mt-5">Página não encontrada</h1>} />
             </Routes>

@@ -1,36 +1,71 @@
-import React from 'react';
-import { Container, Form, Button, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+// Removemos o useNavigate pois vamos usar o window.location para forçar a atualização
 
 const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // SUCESSO! Guardamos o Token no navegador
+                localStorage.setItem('token', data.token);
+                
+                // MUDANÇA AQUI: Forçamos o recarregamento para a Navbar atualizar
+                window.location.href = '/admin'; 
+            } else {
+                setError(data.message || "Erro no login");
+            }
+        } catch (err) {
+            setError("Erro de conexão com o servidor");
+        }
+    };
+
     return (
-        <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-            <Card style={{ width: '100%', maxWidth: '400px' }} className="shadow-sm border-0">
-                <Card.Body className="p-4">
-                    <h3 className="text-center mb-4">Bem-vindo</h3>
-                    
-                    <Form>
-                        <Form.Group className="mb-3" controlId="formBasicEmail">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Seu email" />
-                        </Form.Group>
+        <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+            <Card className="shadow p-4" style={{ width: '400px' }}>
+                <h3 className="text-center mb-4">Área Restrita 🔒</h3>
+                
+                {error && <Alert variant="danger">{error}</Alert>}
 
-                        <Form.Group className="mb-4" controlId="formBasicPassword">
-                            <Form.Label>Senha</Form.Label>
-                            <Form.Control type="password" placeholder="Sua senha" />
-                        </Form.Group>
+                <Form onSubmit={handleLogin}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control 
+                            type="email" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required 
+                        />
+                    </Form.Group>
 
-                        <div className="d-grid gap-2">
-                            <Button variant="warning" type="submit" className="fw-bold">
-                                Entrar
-                            </Button>
-                        </div>
-                    </Form>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Senha</Form.Label>
+                        <Form.Control 
+                            type="password" 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required 
+                        />
+                    </Form.Group>
 
-                    <div className="text-center mt-3">
-                        <small>Não tem conta? <Link to="/cadastro" className="text-primary text-decoration-none">Cadastre-se</Link></small>
-                    </div>
-                </Card.Body>
+                    <Button variant="primary" type="submit" className="w-100">
+                        Entrar
+                    </Button>
+                </Form>
             </Card>
         </Container>
     );
