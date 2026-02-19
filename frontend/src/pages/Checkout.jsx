@@ -99,7 +99,7 @@ const Checkout = () => {
             itens: cart.map((item) => {
                 const produtoId = item.id ?? item._id;
                 return {
-                    produtoId: String(produtoId),
+                    produtoId,
                     titulo: item.titulo,
                     quantidade: item.quantity,
                     precoUnitario: item.preco,
