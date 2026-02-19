@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema({
     ],
     total: { type: Number, required: true },
     pagamento: {
+        metodo: { type: String, enum: ['boleto', 'credito', 'debito'], required: true },
         metodo: { type: String, enum: ['pix', 'credito', 'debito'], required: true },
         bandeira: { type: String, required: false },
         ultimos4: { type: String, required: false },

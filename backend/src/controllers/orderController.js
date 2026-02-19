@@ -10,6 +10,7 @@ exports.createOrder = async (req, res) => {
             endereco,
             itens,
             total,
+            pagamento: pagamento || { metodo: 'boleto' }
             pagamento: pagamento || { metodo: 'pix' }
         });
 

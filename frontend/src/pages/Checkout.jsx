@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Container, Row, Col, Form, Button, Card, Spinner } from 'react-bootstrap';
 import { CartContext } from '../context/CartContext';
+import { BiCheckCircle, BiMap, BiUser, BiCreditCard } from 'react-icons/bi';
 import { BiCheckCircle, BiMap, BiUser, BiCreditCard, BiQr } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,6 +24,7 @@ const Checkout = () => {
     });
 
     // Estados de Pagamento
+    const [formaPagamento, setFormaPagamento] = useState('boleto');
     const [formaPagamento, setFormaPagamento] = useState('pix');
     const [bandeiraCartao, setBandeiraCartao] = useState('');
     const [ultimos4Digitos, setUltimos4Digitos] = useState('');
@@ -31,10 +33,8 @@ const Checkout = () => {
     const [erro, setErro] = useState(null);
     const [enviandoPedido, setEnviandoPedido] = useState(false);
 
-    // Calcula total
     const totalPedido = cart.reduce((acc, item) => acc + (item.preco * item.quantity), 0);
 
-    // Busca o CEP
     const buscarCep = async () => {
         const cepLimpo = cep.replace(/\D/g, '');
 
@@ -65,7 +65,6 @@ const Checkout = () => {
         }
     };
 
-    // ENVIA O PEDIDO PARA O BACKEND
     const finalizarCompra = async (e) => {
         e.preventDefault();
 
@@ -74,6 +73,9 @@ const Checkout = () => {
             return;
         }
 
+        const pagamentoComCartao = formaPagamento === 'credito' || formaPagamento === 'debito';
+
+        if (pagamentoComCartao && (!bandeiraCartao || ultimos4Digitos.length !== 4)) {
         if ((formaPagamento === 'credito' || formaPagamento === 'debito') && (!bandeiraCartao || ultimos4Digitos.length !== 4)) {
             alert('Preencha os dados do cartão corretamente.');
             return;
@@ -83,6 +85,8 @@ const Checkout = () => {
 
         const pagamento = {
             metodo: formaPagamento,
+            bandeira: pagamentoComCartao ? bandeiraCartao : undefined,
+            ultimos4: pagamentoComCartao ? ultimos4Digitos : undefined,
             bandeira: formaPagamento === 'pix' ? undefined : bandeiraCartao,
             ultimos4: formaPagamento === 'pix' ? undefined : ultimos4Digitos,
         };
@@ -141,15 +145,14 @@ const Checkout = () => {
             <h2 className="mb-4 fw-bold">Finalizar Compra</h2>
 
             <Row>
-                {/* FORMULÁRIO */}
                 <Col md={8}>
                     <Card className="shadow-sm border-0 mb-4">
                         <Card.Header className="bg-white py-3">
                             <h5 className="mb-0 fw-bold"><BiUser className="me-2" /> Seus Dados</h5>
                         </Card.Header>
+
                         <Card.Body className="p-4">
                             <Form onSubmit={finalizarCompra}>
-                                {/* DADOS PESSOAIS */}
                                 <Row className="mb-3">
                                     <Col md={6}>
                                         <Form.Group controlId="nome">
@@ -163,6 +166,7 @@ const Checkout = () => {
                                             />
                                         </Form.Group>
                                     </Col>
+
                                     <Col md={6}>
                                         <Form.Group controlId="email">
                                             <Form.Label>Email (Opcional)</Form.Label>
@@ -180,7 +184,8 @@ const Checkout = () => {
 
                                 <h5 className="mb-3 fw-bold"><BiMap className="me-2" /> Endereço de Entrega</h5>
 
-                                {/* ENDEREÇO */}
+                                <h5 className="mb-3 fw-bold"><BiMap className="me-2" /> Endereço de Entrega</h5>
+
                                 <Row className="mb-3">
                                     <Col md={4}>
                                         <Form.Group controlId="cep">
@@ -204,9 +209,10 @@ const Checkout = () => {
                                     <Col md={9}>
                                         <Form.Group controlId="rua">
                                             <Form.Label>Rua / Avenida</Form.Label>
-                                            <Form.Control type="text" value={endereco.rua} readOnly className="bg-light" />
+                                            <Form.Control type="text" value={endereco.rua} readOnly className="bg-light" required />
                                         </Form.Group>
                                     </Col>
+
                                     <Col md={3}>
                                         <Form.Group controlId="numero">
                                             <Form.Label>Número</Form.Label>
@@ -224,19 +230,21 @@ const Checkout = () => {
                                     <Col md={5}>
                                         <Form.Group controlId="bairro">
                                             <Form.Label>Bairro</Form.Label>
-                                            <Form.Control type="text" value={endereco.bairro} readOnly className="bg-light" />
+                                            <Form.Control type="text" value={endereco.bairro} readOnly className="bg-light" required />
                                         </Form.Group>
                                     </Col>
+
                                     <Col md={5}>
                                         <Form.Group controlId="cidade">
                                             <Form.Label>Cidade</Form.Label>
-                                            <Form.Control type="text" value={endereco.cidade} readOnly className="bg-light" />
+                                            <Form.Control type="text" value={endereco.cidade} readOnly className="bg-light" required />
                                         </Form.Group>
                                     </Col>
+
                                     <Col md={2}>
                                         <Form.Group controlId="uf">
                                             <Form.Label>UF</Form.Label>
-                                            <Form.Control type="text" value={endereco.estado} readOnly className="bg-light" />
+                                            <Form.Control type="text" value={endereco.estado} readOnly className="bg-light" required />
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -248,6 +256,11 @@ const Checkout = () => {
                                 <Form.Group className="mb-3">
                                     <Form.Check
                                         type="radio"
+                                        id="pagamento-boleto"
+                                        label="Boleto"
+                                        name="formaPagamento"
+                                        value="boleto"
+                                        checked={formaPagamento === 'boleto'}
                                         id="pagamento-pix"
                                         label="Pix"
                                         name="formaPagamento"
@@ -275,6 +288,9 @@ const Checkout = () => {
                                     />
                                 </Form.Group>
 
+                                {formaPagamento === 'boleto' ? (
+                                    <Alert variant="warning">
+                                        Pagamento por boleto selecionado. O boleto será gerado após confirmar o pedido.
                                 {formaPagamento === 'pix' ? (
                                     <Alert variant="success" className="d-flex align-items-center">
                                         <BiQr className="me-2" size={22} />
@@ -288,6 +304,7 @@ const Checkout = () => {
                                                 <Form.Select
                                                     value={bandeiraCartao}
                                                     onChange={(e) => setBandeiraCartao(e.target.value)}
+                                                    required={formaPagamento !== 'boleto'}
                                                     required={formaPagamento !== 'pix'}
                                                 >
                                                     <option value="">Selecione</option>
@@ -298,6 +315,7 @@ const Checkout = () => {
                                                 </Form.Select>
                                             </Form.Group>
                                         </Col>
+
                                         <Col md={5}>
                                             <Form.Group controlId="ultimos4Digitos">
                                                 <Form.Label>Últimos 4 dígitos</Form.Label>
@@ -307,7 +325,7 @@ const Checkout = () => {
                                                     maxLength={4}
                                                     value={ultimos4Digitos}
                                                     onChange={(e) => setUltimos4Digitos(e.target.value.replace(/\D/g, ''))}
-                                                    required={formaPagamento !== 'pix'}
+                                                    required={formaPagamento !== 'boleto'}
                                                 />
                                             </Form.Group>
                                         </Col>
@@ -321,6 +339,7 @@ const Checkout = () => {
                                     className="w-100 mt-3 fw-bold"
                                     disabled={enviandoPedido}
                                 >
+                                    {enviandoPedido ? 'Criando pedido...' : <><BiCheckCircle className="me-2" /> Confirmar Pedido</>}
                                     {enviandoPedido ? (
                                         <>Criando pedido...</>
                                     ) : (
@@ -332,11 +351,11 @@ const Checkout = () => {
                     </Card>
                 </Col>
 
-                {/* RESUMO (Direita) */}
                 <Col md={4}>
                     <Card className="shadow-sm border-0 bg-light">
                         <Card.Body>
                             <h5 className="mb-3 fw-bold">Resumo do Pedido</h5>
+                            {cart.map((item) => (
                             {cart.map(item => (
                                 <div key={item.cartItemId ?? item.id ?? item._id} className="d-flex justify-content-between mb-2 small text-muted">
                                     <span>{item.quantity}x {item.titulo}</span>
