@@ -276,9 +276,9 @@ const Checkout = () => {
                                 </Form.Group>
 
                                 {formaPagamento === 'boleto' ? (
-                                    <Alert variant="warning">
+                                    <div className="alert alert-warning">
                                         Pagamento por boleto selecionado. O boleto será gerado após confirmar o pedido.
-                                    </Alert>
+                                    </div>
                                 ) : (
                                     <Row className="mb-2">
                                         <Col md={7}>
