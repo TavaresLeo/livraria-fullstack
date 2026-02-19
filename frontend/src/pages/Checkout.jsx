@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Card, Spinner } from 'react-bootstra
 import { CartContext } from '../context/CartContext';
 import { BiCheckCircle, BiMap, BiUser, BiCreditCard } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const Checkout = () => {
     const { cart, clearCart } = useContext(CartContext);
@@ -12,7 +13,6 @@ const Checkout = () => {
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
 
-    // Estados do Endereço
     const [cep, setCep] = useState('');
     const [numero, setNumero] = useState('');
     const [endereco, setEndereco] = useState({
