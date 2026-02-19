@@ -97,12 +97,16 @@ const Checkout = () => {
                 estado: endereco.estado,
                 cep,
             },
-            itens: cart.map((item) => ({
-                produtoId: String(item.id ?? item._id),
-                titulo: item.titulo,
-                quantidade: item.quantity,
-                precoUnitario: item.preco,
-            })),
+            itens: cart.map((item) => {
+                const produtoId = item.id ?? item._id;
+
+                return {
+                    produtoId: String(produtoId),
+                    titulo: item.titulo,
+                    quantidade: item.quantity,
+                    precoUnitario: item.preco,
+                };
+            }),
             total: totalPedido,
             pagamento,
         };
