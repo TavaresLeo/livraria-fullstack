@@ -2,14 +2,15 @@ const Order = require('../models/Order');
 
 exports.createOrder = async (req, res) => {
     try {
-        const { cliente, endereco, itens, total } = req.body;
+        const { cliente, endereco, itens, total, pagamento } = req.body;
 
         // Cria o novo pedido na memória
         const novoPedido = new Order({
             cliente,
             endereco,
             itens,
-            total
+            total,
+            pagamento: pagamento || { metodo: 'boleto' }
         });
 
         // Salva no MongoDB

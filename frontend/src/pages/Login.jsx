@@ -29,7 +29,7 @@ const Login = () => {
             } else {
                 setError(data.message || "Erro no login");
             }
-        } catch (err) {
+        } catch {
             setError("Erro de conexão com o servidor");
         }
     };
