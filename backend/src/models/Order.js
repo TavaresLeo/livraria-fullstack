@@ -15,8 +15,7 @@ const orderSchema = new mongoose.Schema({
     },
     itens: [
         {
-            // Aceita IDs legados (Number) e IDs Mongo (_id String)
-            produtoId: { type: mongoose.Schema.Types.Mixed, required: true },
+            produtoId: { type: String, required: true },
             titulo: { type: String, required: true },
             quantidade: { type: Number, required: true },
             precoUnitario: { type: Number, required: true },
@@ -24,7 +23,7 @@ const orderSchema = new mongoose.Schema({
     ],
     total: { type: Number, required: true },
     pagamento: {
-        metodo: { type: String, enum: ['pix', 'boleto', 'credito', 'debito'], required: true },
+        metodo: { type: String, enum: ['boleto', 'credito', 'debito'], required: true },
         bandeira: { type: String, required: false },
         ultimos4: { type: String, required: false },
     },

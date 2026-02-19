@@ -18,19 +18,12 @@ exports.createOrder = async (req, res) => {
     try {
         const { cliente, endereco, itens, total, pagamento } = req.body;
 
-        const metodo = normalizePaymentMethod(pagamento?.metodo || 'boleto');
-        const paymentData = {
-            metodo,
-            bandeira: pagamento?.bandeira,
-            ultimos4: pagamento?.ultimos4,
-        };
-
         const novoPedido = new Order({
             cliente,
             endereco,
             itens,
             total,
-            pagamento: paymentData,
+            pagamento: pagamento || { metodo: 'boleto' }
         });
 
         await novoPedido.save();
