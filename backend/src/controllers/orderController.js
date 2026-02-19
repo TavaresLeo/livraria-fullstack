@@ -11,7 +11,6 @@ exports.createOrder = async (req, res) => {
             itens,
             total,
             pagamento: pagamento || { metodo: 'boleto' }
-            pagamento: pagamento || { metodo: 'pix' }
         });
 
         // Salva no MongoDB

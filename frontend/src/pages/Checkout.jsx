@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import { Container, Row, Col, Form, Button, Card, Spinner } from 'react-bootstrap';
 import { CartContext } from '../context/CartContext';
 import { BiCheckCircle, BiMap, BiUser, BiCreditCard } from 'react-icons/bi';
-import { BiCheckCircle, BiMap, BiUser, BiCreditCard, BiQr } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
@@ -25,7 +24,6 @@ const Checkout = () => {
 
     // Estados de Pagamento
     const [formaPagamento, setFormaPagamento] = useState('boleto');
-    const [formaPagamento, setFormaPagamento] = useState('pix');
     const [bandeiraCartao, setBandeiraCartao] = useState('');
     const [ultimos4Digitos, setUltimos4Digitos] = useState('');
 
@@ -76,7 +74,6 @@ const Checkout = () => {
         const pagamentoComCartao = formaPagamento === 'credito' || formaPagamento === 'debito';
 
         if (pagamentoComCartao && (!bandeiraCartao || ultimos4Digitos.length !== 4)) {
-        if ((formaPagamento === 'credito' || formaPagamento === 'debito') && (!bandeiraCartao || ultimos4Digitos.length !== 4)) {
             alert('Preencha os dados do cartão corretamente.');
             return;
         }
@@ -87,8 +84,6 @@ const Checkout = () => {
             metodo: formaPagamento,
             bandeira: pagamentoComCartao ? bandeiraCartao : undefined,
             ultimos4: pagamentoComCartao ? ultimos4Digitos : undefined,
-            bandeira: formaPagamento === 'pix' ? undefined : bandeiraCartao,
-            ultimos4: formaPagamento === 'pix' ? undefined : ultimos4Digitos,
         };
 
         const pedido = {
@@ -103,7 +98,6 @@ const Checkout = () => {
             },
             itens: cart.map((item) => {
                 const produtoId = item.id ?? item._id;
-
                 return {
                     produtoId: String(produtoId),
                     titulo: item.titulo,
@@ -184,8 +178,6 @@ const Checkout = () => {
 
                                 <h5 className="mb-3 fw-bold"><BiMap className="me-2" /> Endereço de Entrega</h5>
 
-                                <h5 className="mb-3 fw-bold"><BiMap className="me-2" /> Endereço de Entrega</h5>
-
                                 <Row className="mb-3">
                                     <Col md={4}>
                                         <Form.Group controlId="cep">
@@ -261,11 +253,6 @@ const Checkout = () => {
                                         name="formaPagamento"
                                         value="boleto"
                                         checked={formaPagamento === 'boleto'}
-                                        id="pagamento-pix"
-                                        label="Pix"
-                                        name="formaPagamento"
-                                        value="pix"
-                                        checked={formaPagamento === 'pix'}
                                         onChange={(e) => setFormaPagamento(e.target.value)}
                                     />
                                     <Form.Check
@@ -291,10 +278,6 @@ const Checkout = () => {
                                 {formaPagamento === 'boleto' ? (
                                     <Alert variant="warning">
                                         Pagamento por boleto selecionado. O boleto será gerado após confirmar o pedido.
-                                {formaPagamento === 'pix' ? (
-                                    <Alert variant="success" className="d-flex align-items-center">
-                                        <BiQr className="me-2" size={22} />
-                                        Pagamento via Pix selecionado. O código será exibido após confirmar o pedido.
                                     </Alert>
                                 ) : (
                                     <Row className="mb-2">
@@ -305,7 +288,6 @@ const Checkout = () => {
                                                     value={bandeiraCartao}
                                                     onChange={(e) => setBandeiraCartao(e.target.value)}
                                                     required={formaPagamento !== 'boleto'}
-                                                    required={formaPagamento !== 'pix'}
                                                 >
                                                     <option value="">Selecione</option>
                                                     <option value="visa">Visa</option>
@@ -340,11 +322,6 @@ const Checkout = () => {
                                     disabled={enviandoPedido}
                                 >
                                     {enviandoPedido ? 'Criando pedido...' : <><BiCheckCircle className="me-2" /> Confirmar Pedido</>}
-                                    {enviandoPedido ? (
-                                        <>Criando pedido...</>
-                                    ) : (
-                                        <><BiCheckCircle className="me-2" /> Confirmar Pedido</>
-                                    )}
                                 </Button>
                             </Form>
                         </Card.Body>
@@ -356,7 +333,6 @@ const Checkout = () => {
                         <Card.Body>
                             <h5 className="mb-3 fw-bold">Resumo do Pedido</h5>
                             {cart.map((item) => (
-                            {cart.map(item => (
                                 <div key={item.cartItemId ?? item.id ?? item._id} className="d-flex justify-content-between mb-2 small text-muted">
                                     <span>{item.quantity}x {item.titulo}</span>
                                     <span>R$ {(item.preco * item.quantity).toFixed(2).replace('.', ',')}</span>
