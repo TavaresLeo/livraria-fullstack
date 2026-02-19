@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Container, Row, Col, Form, Button, Card, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, Spinner } from 'react-bootstrap';
 import { CartContext } from '../context/CartContext';
 import { BiCheckCircle, BiMap, BiUser, BiCreditCard } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
