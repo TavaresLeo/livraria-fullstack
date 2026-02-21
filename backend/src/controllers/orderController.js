@@ -2,7 +2,6 @@ const Order = require('../models/Order');
 
 const normalizePaymentMethod = (metodo = '') => {
     const normalized = String(metodo).toLowerCase();
-
     const aliases = {
         cartao_credito: 'credito',
         credito_cartao: 'credito',
@@ -15,46 +14,16 @@ const normalizePaymentMethod = (metodo = '') => {
     return aliases[normalized] || normalized;
 };
 
-const normalizeItems = (itens = []) => {
-    if (!Array.isArray(itens)) return [];
-
-    return itens
-        .map((item) => {
-            const produtoId = item?.produtoId ?? item?.id ?? item?._id ?? item?.cartItemId;
-            if (!produtoId) return null;
-
-            return {
-                produtoId,
-                titulo: item?.titulo,
-                quantidade: Number(item?.quantidade),
-                precoUnitario: Number(item?.precoUnitario),
-            };
-        })
-        .filter((item) => item && item.titulo && item.quantidade > 0 && item.precoUnitario >= 0);
-};
-
 exports.createOrder = async (req, res) => {
     try {
         const { cliente, endereco, itens, total, pagamento } = req.body;
 
-        const itensNormalizados = normalizeItems(itens);
-        if (itensNormalizados.length === 0) {
-            return res.status(400).json({ message: 'Pedido sem itens válidos.' });
-        }
-
-        const metodo = normalizePaymentMethod(pagamento?.metodo || 'boleto');
-        const paymentData = {
-            metodo,
-            bandeira: pagamento?.bandeira,
-            ultimos4: pagamento?.ultimos4,
-        };
-
         const novoPedido = new Order({
             cliente,
             endereco,
-            itens: itensNormalizados,
+            itens,
             total,
-            pagamento: paymentData,
+            pagamento: pagamento || { metodo: 'boleto' }
         });
 
         await novoPedido.save();
@@ -67,11 +36,8 @@ exports.createOrder = async (req, res) => {
         });
     } catch (error) {
         console.error('Erro ao criar pedido:', error);
-
-        const isValidationError = error?.name === 'ValidationError' || error?.name === 'CastError';
-
-        res.status(isValidationError ? 400 : 500).json({
-            message: isValidationError ? 'Dados inválidos para processar o pedido' : 'Erro ao processar o pedido',
+        res.status(500).json({
+            message: 'Erro ao processar o pedido',
             details: error?.message,
         });
     }

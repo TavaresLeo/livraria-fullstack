@@ -9,6 +9,7 @@ const Checkout = () => {
     const { cart, clearCart } = useContext(CartContext);
     const navigate = useNavigate();
 
+    // Estados do Cliente
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
 
@@ -21,6 +22,7 @@ const Checkout = () => {
         estado: '',
     });
 
+    // Estados de Pagamento
     const [formaPagamento, setFormaPagamento] = useState('boleto');
     const [bandeiraCartao, setBandeiraCartao] = useState('');
     const [ultimos4Digitos, setUltimos4Digitos] = useState('');
@@ -94,41 +96,39 @@ const Checkout = () => {
                 estado: endereco.estado,
                 cep,
             },
-            itens: cart
-                .map((item) => {
-                    const produtoId = item.id ?? item._id ?? item.cartItemId;
-
-                    if (!produtoId) return null;
-
-                    return {
-                        produtoId,
-                        titulo: item.titulo,
-                        quantidade: item.quantity,
-                        precoUnitario: item.preco,
-                    };
-                })
-                .filter(Boolean),
+            itens: cart.map((item) => {
+                const produtoId = item.id ?? item._id;
+                return {
+                    produtoId,
+                    titulo: item.titulo,
+                    quantidade: item.quantity,
+                    precoUnitario: item.preco,
+                };
+            }),
             total: totalPedido,
             pagamento,
         };
 
-        if (pedido.itens.length === 0) {
-            setEnviandoPedido(false);
-            alert('Nenhum item válido no carrinho para finalizar o pedido.');
-            return;
-        }
-
         try {
-            const response = await api.post('/pedidos', pedido);
+            const response = await fetch('https://minha-api-livraria.onrender.com/api/pedidos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pedido),
+            });
 
-            alert(`Sucesso! Pedido realizado. ID: ${response.data.orderId}`);
-            clearCart();
-            navigate('/admin');
+            if (response.ok) {
+                const dados = await response.json();
+                alert(`Sucesso! Pedido realizado. ID: ${dados.orderId}`);
+                clearCart();
+                navigate('/');
+            } else {
+                alert('Erro ao salvar pedido. Tente novamente.');
+            }
         } catch (error) {
-            const backendMessage = error.response?.data?.details || error.response?.data?.message;
-            const fallbackMessage = 'Erro ao salvar pedido. Tente novamente.';
-            alert(backendMessage ? `${fallbackMessage}\nDetalhe: ${backendMessage}` : fallbackMessage);
-            console.error('Erro ao salvar pedido:', error);
+            console.error('Erro de conexão:', error);
+            alert('Erro de conexão com o servidor.');
         } finally {
             setEnviandoPedido(false);
         }
