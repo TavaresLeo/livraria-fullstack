@@ -1,100 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Table, Badge, Button, Spinner } from 'react-bootstrap';
-import { BiCheckCircle, BiRefresh } from 'react-icons/bi';
+import React, { useState, useEffect } from 'react';
+import { Container, Table, Spinner, Badge, Alert } from 'react-bootstrap';
 
 const Admin = () => {
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const carregarPedidos = () => {
-        setLoading(true);
-        fetch('http://localhost:3000/api/pedidos')
-            .then(res => res.json())
-            .then(data => {
-                setPedidos(data);
-                setLoading(false);
-            })
-            .catch(err => console.error("Erro:", err));
-    };
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        carregarPedidos();
-    }, []);
+        const fetchPedidos = async () => {
+            const token = localStorage.getItem('token'); // Pega o crachá do Admin
+            
+            try {
+                const response = await fetch('https://minha-api-livraria.onrender.com/api/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Exibe o crachá para a API
+                    }
+                });
 
-    // FUNÇÃO QUE ATUALIZA O STATUS
-    const marcarComoEnviado = async (id) => {
-        if (!window.confirm("Confirmar envio deste pedido?")) return;
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/pedidos/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Enviado 🚚' })
-            });
-
-            if (response.ok) {
-                // Atualiza a lista na tela sem precisar dar F5
-                setPedidos(pedidos.map(p => 
-                    p._id === id ? { ...p, status: 'Enviado 🚚' } : p
-                ));
+                if (!response.ok) throw new Error("Falha ao buscar pedidos. Verifique seu login.");
+                
+                const data = await response.json();
+                setPedidos(data);
+            } catch (err) {
+                console.error("Erro no Admin:", err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            alert("Erro ao atualizar status");
-        }
-    };
+        };
 
-    if (loading) return <Container className="py-5 text-center"><Spinner animation="border" /></Container>;
+        fetchPedidos();
+    }, []);
 
     return (
         <Container className="py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold">Painel Administrativo</h2>
-                <Button variant="outline-primary" onClick={carregarPedidos}>
-                    <BiRefresh size={24}/> Atualizar Lista
-                </Button>
-            </div>
+            <h2 className="mb-4 fw-bold">Painel Administrativo ⚙️</h2>
             
-            <Table striped bordered hover responsive className="shadow-sm bg-white align-middle">
-                <thead className="bg-dark text-white">
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {pedidos.map(pedido => (
-                        <tr key={pedido._id}>
-                            <td><small className="text-muted">...{pedido._id.slice(-6)}</small></td>
-                            <td>
-                                <strong>{pedido.cliente.nome}</strong><br/>
-                                <small className="text-muted">{pedido.endereco.cidade}</small>
-                            </td>
-                            <td className="fw-bold text-success">
-                                R$ {pedido.total.toFixed(2).replace('.', ',')}
-                            </td>
-                            <td>
-                                <Badge bg={pedido.status.includes('Enviado') ? 'success' : 'warning'} className="p-2">
-                                    {pedido.status}
-                                </Badge>
-                            </td>
-                            <td>
-                                {pedido.status === 'Pendente' && (
-                                    <Button 
-                                        variant="outline-success" 
-                                        size="sm"
-                                        onClick={() => marcarComoEnviado(pedido._id)}
-                                    >
-                                        <BiCheckCircle className="me-1"/> Despachar
-                                    </Button>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
+            {error && <Alert variant="danger">{error}</Alert>}
+
+            <h4 className="mt-4 mb-3 text-secondary">Últimos Pedidos</h4>
+            
+            {loading ? (
+                <div className="text-center py-5">
+                    <Spinner animation="border" variant="primary" />
+                </div>
+            ) : (
+                <div className="bg-white p-4 shadow-sm rounded">
+                    <Table striped hover responsive className="align-middle">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>ID do Pedido</th>
+                                <th>Data</th>
+                                <th>Itens (Livros)</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {pedidos.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-4 text-muted">
+                                        Nenhum pedido foi feito ainda.
+                                    </td>
+                                </tr>
+                            ) : (
+                                pedidos.map((pedido) => (
+                                    <tr key={pedido._id}>
+                                        <td className="text-muted small">{pedido._id}</td>
+                                        <td>{new Date(pedido.dataCriacao).toLocaleDateString('pt-BR')}</td>
+                                        <td>
+                                            {/* O populate do backend traz os títulos dos livros aqui */}
+                                            {pedido.itens.map((item, index) => (
+                                                <div key={index}>
+                                                    <strong>{item.quantidade}x</strong> {item.produto?.titulo || 'Livro Excluído do Banco'}
+                                                </div>
+                                            ))}
+                                        </td>
+                                        <td className="text-success fw-bold">
+                                            R$ {pedido.total.toFixed(2).replace('.', ',')}
+                                        </td>
+                                        <td>
+                                            <Badge bg={pedido.status === 'Pendente' ? 'warning' : 'success'} text="dark">
+                                                {pedido.status}
+                                            </Badge>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            )}
         </Container>
     );
 };

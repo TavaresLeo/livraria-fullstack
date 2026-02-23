@@ -15,8 +15,20 @@ app.use((req, res, next) => {
 });
 // ----------------------------------
 
-// Rotas
-app.use('/api', productRoutes);
-app.use('/api', orderRoutes);
+// --- ROTAS DE PRODUTOS ---
+app.get('/api/produtos', productController.getAllProducts);
+app.get('/api/produtos/:id', productController.getProductById);
+app.post('/api/produtos', authController.verifyToken, productController.createProduct);
+
+// --- ROTAS DE PEDIDOS (A CORREÇÃO ESTÁ AQUI 👇) ---
+// 1. Rota PÚBLICA: Qualquer cliente pode CRIAR um pedido (sem token)
+app.post('/api/orders', orderController.createOrder);
+
+// 2. Rotas PROTEGIDAS: Só o Admin logado pode LER ou ATUALIZAR os pedidos
+app.get('/api/orders', authController.verifyToken, orderController.getAllOrders);
+app.put('/api/orders/:id/status', authController.verifyToken, orderController.updateOrderStatus);
+
+// --- ROTAS DE AUTENTICAÇÃO ---
+app.post('/api/login', authController.login);
 
 module.exports = app;
